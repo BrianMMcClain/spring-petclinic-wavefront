@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import io.micrometer.core.instrument.Metrics;
+
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.Map;
@@ -135,6 +137,7 @@ class OwnerController {
 	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
 		Owner owner = this.owners.findById(ownerId);
+		Metrics.counter("owner.lookup", "name", owner.getLastName() + ", " + owner.getFirstName()).increment();
 		for (Pet pet : owner.getPets()) {
 			pet.setVisitsInternal(visits.findByPetId(pet.getId()));
 		}
